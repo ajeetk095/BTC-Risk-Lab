@@ -1,0 +1,64 @@
+== Cached Yahoo Finance CSV - BTC-USD | n=1884 | 2020-01-02 .. 2025-02-27
+
+-- unit roots --
+   series    n   ADF_stat        ADF_p  ADF_lags  KPSS_stat  KPSS_p                                                           verdict
+   Close 1884  -1.085055 7.209948e-01        25   2.950167 <= 0.01                                                    I(1) unit root
+ lnClose 1884  -1.495516 5.357282e-01         9   3.136917 <= 0.01                                                    I(1) unit root
+  Volume 1884  -3.728458 3.730219e-03        21   0.761097 <= 0.01 conflicting - possible fractionally integrated / structural break
+lnVolume 1884  -2.918318 4.325894e-02        26   1.090114 <= 0.01 conflicting - possible fractionally integrated / structural break
+  dClose 1884  -7.645347 1.848988e-11        24   0.119904 >= 0.10                                                   I(0) stationary
+ ret_pct 1884 -14.061670 3.048737e-26         8   0.209332 >= 0.10                                                   I(0) stationary
+ dVol_bn 1884 -12.751716 8.506464e-24        26   0.036162 >= 0.10                                                   I(0) stationary
+
+-- EG BTC/Volume -- {'beta': 0.0, 'r2': 0.11476, 'dw': 0.06135, 'naive_adf_p': 0.89874, 'eg_stat': -0.50123, 'eg_p': 0.96424, 'cointegrated': False, 'precondition_ok': False, 'condition_number': 79235291914.42526, 'n': 1884}
+   orders: [('Close', 1), ('Volume', 0)]
+   ECM phi= -0.00144 p= 0.3146 valid= False
+
+-- VAR -- {'maxlags': 20, 'orders': {'aic': 20, 'bic': 7, 'hqic': 14, 'fpe': 20}, 'p': 7, 'n': 1884, 'stable': True, 'whiteness_p': 6.677163548346303e-10, 'aic': 19.095007114895918, 'bic': 19.183511590707106, 'granger': {'test': 'dVol_bn -> dClose', 'stat': 2.7967856136122693, 'p': 0.006655613162594764}}
+
+-- EG GOOGL/GOOG (log) -- {'beta': 0.9922666405807581, 'r2': 0.9996179212458904, 'eg_p': 0.007788633620430577, 'cointegrated': True, 'precondition_ok': True, 'n': 1295}
+   ECM: {'phi': -0.054640370149051924, 'phi_p': 2.5118329219638175e-09, 'gamma': 0.999321317114415, 'r2': 0.9914204903983074, 'half_life_days': 12.33580473690971, 'valid': True, 'n': 1294}
+
+-- Markov on PERCENT RETURNS (recommended) --
+    {'regime': 0, 'mu': 0.0796, 'mu_p': 0.2209, 'sigma2': 2.7144, 'sigma': np.float64(1.6475), 'expected_duration': 4.0826, 'share': 0.7505}
+    {'regime': 1, 'mu': 0.3798, 'mu_p': 0.071, 'sigma2': 25.8987, 'sigma': np.float64(5.0891), 'expected_duration': 2.2849, 'share': 0.2495}
+-- Markov on DOLLAR DIFFERENCES (original spec) -- predict() range = [21.08, 58.79] -> DOLLARS, not a probability
+   high-vol share by year, dollar spec : {2020: 0.07, 2021: 1.0, 2022: 0.52, 2023: 0.26, 2024: 0.95, 2025: 0.93}
+   high-vol share by year, returns spec: {2020: 0.25, 2021: 0.44, 2022: 0.22, 2023: 0.13, 2024: 0.22, 2025: 0.17}
+   episodes>=3d: 217
+
+-- VIF --
+    feature       VIF     flag
+  ma10_gap 27.564710   severe
+  ma20_gap 18.607534   severe
+  ma50_gap 12.545841   severe
+     mom10  8.246904 moderate
+      mom5  7.683707 moderate
+   ma5_gap  5.962287 moderate
+ ma100_gap  5.900765 moderate
+     vol10  5.341388 moderate
+     vol20  3.631107       ok
+      vol5  2.906526       ok
+log_volume  1.578615       ok
+   PCA cum: [0.473 0.74  0.847 0.895 0.932 0.96  0.975 0.986 0.994 0.998 1.   ] n_for_90: 5
+   OOS MSE: {'OLS': 9.9702, 'Ridge': 9.9289, 'PCR3': 9.9055, 'Trimmed OLS': 9.9659}
+   gain %: {'OLS': 0.0, 'Ridge': 0.41, 'PCR3': 0.65, 'Trimmed OLS': 0.04} dropped: ['ma10_gap', 'ma20_gap']
+
+-- GARCH -- GARCH(1,1)-t {'mu': 0.09621, 'omega': 0.15072, 'alpha[1]': 0.06579, 'beta[1]': 0.93421, 'nu': 3.10158}
+   persistence= 1.0 IGARCH= True at_boundary= True nu= 3.102
+   spec comparison:
+              spec       loglik         AIC         BIC  persistence       nu
+    EGARCH(1,1)-t -4640.219098 9292.438197 9325.685111     0.989629 2.989256
+     GARCH(1,1)-t -4645.871295 9301.742590 9329.448352     1.000000 3.101579
+ GJR-GARCH(1,1)-t -4645.862667 9303.725334 9336.972249     1.000000 3.101130
+GARCH(1,1)-normal -4842.931918 9693.863836 9716.028445     0.966258      NaN
+   Kalman s/n= 1.0585521465698282e-05
+   corr(r2, cond var)= 0.1315
+   volume outliers cleaned: ['2021-02-26'] | ridge_at_edge: True | regime quality: mixture-like (short-lived states)
+   VaR table:
+  horizon_days  vol_forecast_pct  cum_vol_pct  VaR95_pct  VaR99_pct   method
+            1          2.796254     2.796254  -3.773741  -7.276030 analytic
+            2          2.823076     3.973511  -3.810863  -7.346746 analytic
+            3          2.849645     4.889711  -3.847634  -7.416796 analytic
+
+Saved figures -> /home/claude/proj/btc-econometrics-lab/figures  results -> /home/claude/proj/btc-econometrics-lab/report/results.json

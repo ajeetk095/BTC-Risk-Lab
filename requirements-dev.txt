@@ -1,0 +1,9 @@
+# only needed to rebuild the notebook, slides and PDF report (not for the app)
+-r requirements.txt
+nbformat
+nbclient
+nbconvert
+ipykernel
+python-pptx
+reportlab
+seaborn
